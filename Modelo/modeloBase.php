@@ -80,8 +80,6 @@ class ModeloBase {
         return $stmt->rowCount();
     }
 
-    // --- MÉTODOS DE UTILIDAD (Del código de tu compañera) ---
-
     /**
      * Ejecuta un SELECT y retorna los resultados (igual que listar/buscar, pero más genérico).
      */
