@@ -14,7 +14,7 @@ document.addEventListener("submit", function(e) {
             const msg = document.getElementById("login-msg");
             if (data.success) {
                 msg.innerHTML = "Login correcto. Redirigiendo...";
-                setTimeout(() => location.href = "index.php", 800);
+                setTimeout(() => location.href = "inicioSesion.php", 800);
             } else {
                 msg.innerHTML = data.error;
             }
@@ -39,7 +39,7 @@ document.addEventListener("submit", function(e) {
             const msg = document.getElementById("registro-msg");
             if (data.success) {
                 msg.innerHTML = "Cuenta creada. Redirigiendo...";
-                setTimeout(() => location.href = "index.php", 800);
+                setTimeout(() => location.href = "inicioSesion.php", 800);
             } else {
                 msg.innerHTML = data.error;
             }
@@ -77,7 +77,7 @@ document.addEventListener("click", function(e) {
     if (e.target.id === "btn-logout") {
         fetch("../Control/ajaxSession.php?a=logout")
         .then(r => r.json())
-        .then(() => location.href = "index.php");
+        .then(() => location.href = "inicioSesion.php");
     }
 });
 

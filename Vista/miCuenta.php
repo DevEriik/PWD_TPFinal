@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario'])) {
-    header("Location: login.php");
+    header("Location: inicioSesion.php");
     exit;
 }
 ?>
@@ -34,7 +34,7 @@ if (!isset($_SESSION['usuario'])) {
 
 <div id="micuenta-msg"></div>
 
-<p><a href="index.php">Volver al inicio</a></p>
+<p><a href="inicioSesion.php">Volver al inicio</a></p>
 
 <script src="../public/js/app.js"></script>
 </body>
