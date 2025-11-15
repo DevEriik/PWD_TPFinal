@@ -1,4 +1,5 @@
 <?php
+//Maneja todo lo relacionado al usuario en la base de datos.
 require_once __DIR__ . '/modeloBase.php';
 
 class Usuario extends ModeloBase {

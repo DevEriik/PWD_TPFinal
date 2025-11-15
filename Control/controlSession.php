@@ -1,4 +1,5 @@
 <?php
+//Maneja todo el inicio y cierre de sesion. 
 session_start();
 
 require_once __DIR__ . '/../Modelo/usuario.php';

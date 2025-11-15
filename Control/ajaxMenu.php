@@ -1,4 +1,5 @@
 <?php
+//Es llamado por app.js para pedir el menu sin recargar la pagina.
 require_once "controlMenu.php";
 
 $ctrl = new Control_Menu();

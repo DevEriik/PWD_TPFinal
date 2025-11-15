@@ -1,4 +1,6 @@
 <?php
+//Es llamado por app.js para saber si hay una sesion activa, que usuario esta 
+//logueado y cierra sesion por ajax sin recargar la pagina.
 session_start();
 require_once __DIR__ . '/../Modelo/usuario.php';
 

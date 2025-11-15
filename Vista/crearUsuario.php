@@ -1,4 +1,6 @@
-<?php session_start(); ?>
+<?php 
+//Muestra el formulario para crear un usuario nuevo.
+session_start(); ?>
 <!DOCTYPE html>
 <html>
 <head>

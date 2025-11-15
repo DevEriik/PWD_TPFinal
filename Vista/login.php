@@ -1,4 +1,6 @@
-<?php session_start(); ?>
+<?php 
+//Muestra el formulario de incio de sesion.
+session_start(); ?>
 <!DOCTYPE html>
 <html>
 <head>

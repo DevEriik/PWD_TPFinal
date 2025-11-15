@@ -1,4 +1,5 @@
 <?php
+//Construye el menu segun el rol del usuario. Usa ajax para no recargar la pagina.
 session_start();
 
 require_once __DIR__ . '/../util/conexion.php';

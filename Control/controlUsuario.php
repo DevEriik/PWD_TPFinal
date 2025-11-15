@@ -1,4 +1,5 @@
 <?php
+//Gestiona todos los usuarios, registra usuarios nuevos y actualiza datos.
 session_start();
 
 require_once __DIR__ . '/../Modelo/usuario.php';

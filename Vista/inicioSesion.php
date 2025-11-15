@@ -1,4 +1,6 @@
-<?php session_start(); ?>
+<?php 
+//Muestra si el usuario pudo entrar correctamente.
+session_start(); ?>
 <!DOCTYPE html>
 <html>
 <head>

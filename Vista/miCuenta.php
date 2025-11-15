@@ -1,4 +1,5 @@
 <?php
+//Actualiza datos de usuario.
 session_start();
 if (!isset($_SESSION['usuario'])) {
     header("Location: inicioSesion.php");
