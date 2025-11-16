@@ -4,9 +4,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 // ---- FIN: Pega esto al inicio de tu archivo ----
-require_once '../../Control/Session.php';
-require_once '../../Control/ABMCompraItem.php';
-include_once '../../configuracion.php';
+//require_once '../../Control/Session.php';
+//require_once '../../Control/ABMCompraItem.php';
+require_once '../../configuracion.php';
 $session = new Session();
 // verificación para saber si el usuario está logueado o no y así saber si mostrarle la vista pública o privada.
 if ($session->activa() && $session->validar()) { //si la sesion es valida se muestra headerSeguro.php
