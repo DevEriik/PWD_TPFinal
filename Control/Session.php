@@ -20,7 +20,7 @@ class Session {
         $obj = new ABMUsuario();
         $param['usnombre'] = $nombreUsuario;      //nombre de usuario ingresado
         $param['uspass'] = $psw;                //contraseña ingresada
-        $param['usdeshabilitado'] = '0000-00-00 00:00:00'; // Usuario no deshabilitado
+        //$param['usdeshabilitado'] = '0000-00-00 00:00:00'; // Usuario no deshabilitado
 
         $resultado = $obj->buscar($param);   //busca el usuario en la base de datos con esas caracteristias
         if (count($resultado) > 0) {
