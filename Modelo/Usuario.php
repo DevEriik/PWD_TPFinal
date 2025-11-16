@@ -168,16 +168,31 @@ class Usuario{
 
     public function insertar(){
         $resp = false;
-        $base=new BaseDatos();
-        $sql="INSERT INTO usuario(usnombre,uspass,usmail,usdeshabilitado)  VALUES('".$this->getUsnombre()."','".$this->getUspass()."','".$this->getUsmail()."','".$this->getUsdeshabilitado()."');"; 
-        if ($base->Iniciar()) {
-            if ($base->Ejecutar($sql)) {
-                $resp = true;
-            } else {
-                $this->setmensajeoperacion("usuario->insertar: ".$base->getError());
-            }
+        $base = new BaseDatos();
+        
+        // 1. Preparamos la fecha (NULL o valor)
+        $usdeshabilitado_sql = $this->getUsdeshabilitado();
+        
+        if ($usdeshabilitado_sql == null) {
+            $usdeshabilitado_sql = "NULL";
         } else {
-            $this->setmensajeoperacion("usuario->insertar: ".$base->getError());
+            $usdeshabilitado_sql = "'" . $usdeshabilitado_sql . "'";
+        }
+        
+        // 2. Construimos la consulta SQL
+        // CORRECCIÓN: Usamos getUsnombre() y getUsmail() tal como están en tu clase
+        $sql = "INSERT INTO usuario(usnombre, uspass, usmail, usdeshabilitado)  VALUES(
+                    '".$this->getUsnombre()."', 
+                    '".$this->getUspass()."', 
+                    '".$this->getUsmail()."', 
+                    ".$usdeshabilitado_sql." 
+                );";
+        
+        if($base->Ejecutar($sql)){
+             $this->setIdusuario($base->lastInsertId());
+            $resp = true;
+        }else{
+            $this->setmensajeoperacion("Usuario->insertar: ".$base->getError());
         }
         return $resp;
     }
