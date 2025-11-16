@@ -94,7 +94,7 @@ class ABMUsuario {
     public function alta($param) {
         $resp = false;
         $param['idusuario'] = null; // Establecer idusuario en null
-        $param['usdeshabilitado']=null;
+        $param['usdeshabilitado'] = null;
 
         $objUsuario = $this->cargarObjeto($param);
         if ($objUsuario != null and $objUsuario->insertar()) {
