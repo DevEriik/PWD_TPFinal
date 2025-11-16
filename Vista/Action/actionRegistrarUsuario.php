@@ -1,5 +1,11 @@
 <?php
 
+// ---- INICIO: Pega esto al inicio de tu archivo ----
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+// ---- FIN: Pega esto al inicio de tu archivo ----
+
 include_once '../../configuracion.php';
 
 // Verifica si es una solicitud AJAX
