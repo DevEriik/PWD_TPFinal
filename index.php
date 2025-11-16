@@ -1,3 +1,3 @@
 <?php
-header('Location: Vista/Home/Productos.php');
+header('Location: Vista/Home/productos.php');
 ?>
