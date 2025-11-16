@@ -11,6 +11,8 @@ class BaseDatos extends PDO {
   	private $indice;
   	private $resultado;
   	private $cantFilasResultado;
+    private $error;
+    private $sql;
     
     public function __construct(){
         $this->engine = 'mysql';
