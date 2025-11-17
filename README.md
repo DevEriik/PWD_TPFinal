@@ -72,7 +72,7 @@ Para correr este proyecto en un entorno local, sigue estos pasos:
 3.  **Importar la Base de Datos:**
     * Abrir `phpMyAdmin` (o el gestor de BBDD que utilices).
     * Crear una nueva base de datos (ej: `pwd_tpfinal`).
-    * Importar el archivo `.sql` que se encuentra en la carpeta `[ruta/a/tu/archivo.sql]` de este proyecto. *(¡Asegúrate de incluir este archivo en tu repo!)*
+    * Importar el archivo `.sql` que se encuentra en la carpeta `[ruta/a/tu/archivo.sql]` de este proyecto.
 4.  **Configurar la conexión:**
     * Revisa el archivo de configuración de la base de datos (ej: `config/db.php` o `conexion.php`).
     * Asegúrate de que el nombre de la base de datos, el usuario (ej: `root`) y la contraseña coincidan con tu configuración local.
