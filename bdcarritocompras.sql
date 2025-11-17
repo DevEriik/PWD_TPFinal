@@ -40,27 +40,27 @@ CREATE TABLE `producto` (
 --
 -- Volcado de datos para la tabla `producto`
 --
-INSERT INTO `producto` (`idproducto`,`pronombre`,`prodetalle`,`procantstock`, `precioprod`) VALUES
-(1,'Dell XPS 13','Pantalla de 13.4", Intel Core i7, 16GB RAM, 512GB SSD, Windows 10',12, 1200),
-(2,'HP Spectre x360','13.5 Intel Core i5, 8GB RAM, 256GB SSD, convertible 2-en-1, Windows 11',22, 1000),
-(3,'Apple MacBook Air M1','Chip M1, 8GB RAM, 256GB SSD, macOS, Retina Display de 13.3',7, 999),
-(4,'Lenovo ThinkPad X1 Carbon','Pantalla de 14", Intel Core i7, 16GB RAM, 512GB SSD, teclado retroiluminado',15, 1300),
-(5,'Asus ROG Zephyrus G14','Pantalla de 14", AMD Ryzen 9, 16GB RAM, 1TB SSD, GPU NVIDIA RTX 3060',31, 1500),
-(6,'Acer Aspire 5','15.6", Intel Core i5, 8GB RAM, 512GB SSD, Windows 10',42, 700),
-(7,'Microsoft Surface Laptop 4','13.5", Intel Core i5, 8GB RAM, 512GB SSD, pantalla táctil',13, 1100),
-(8,'Razer Blade 15','Pantalla de 15.6", Intel Core i7, 16GB RAM, 1TB SSD, GPU NVIDIA RTX 3070',55, 2000),
-(9,'Lenovo IdeaPad 3','Pantalla de 15.6", AMD Ryzen 5, 8GB RAM, 256GB SSD, Windows 10',42, 600),
-(10,'HP Pavilion 15','15.6", Intel Core i7, 16GB RAM, 512GB SSD, Windows 11',47, 800),
-(11,'Acer Swift 3','Pantalla de 14", AMD Ryzen 7, 8GB RAM, 512GB SSD, Windows 10',44, 750),
-(12,'Dell Inspiron 15 3000','Pantalla de 15.6", Intel Core i5, 8GB RAM, 256GB SSD, Windows 11',32, 650),
-(13,'Asus ZenBook 14','Pantalla de 14", Intel Core i7, 16GB RAM, 512GB SSD, Windows 10, ultraligero',26, 900),
-(14,'HP Envy 13','Pantalla de 13.3", Intel Core i7, 8GB RAM, 256GB SSD, pantalla táctil',25, 950),
-(15,'Lenovo Yoga 7i','Pantalla de 14", Intel Core i5, 8GB RAM, 512GB SSD, convertible 2-en-1, Windows 10',21, 850),
-(16,'Apple MacBook Pro 16"','Chip M1 Pro, 16GB RAM, 512GB SSD, macOS, pantalla Liquid Retina XDR',19, 2500),
-(17,'Samsung Galaxy Book Pro','Pantalla AMOLED de 15.6", Intel Core i7, 16GB RAM, 512GB SSD, diseño ultradelgado',33, 1200),
-(18,'MSI GF63 Thin','Pantalla de 15.6", Intel Core i5, 8GB RAM, 256GB SSD, GPU NVIDIA GTX 1650',32, 750),
-(19,'Acer Nitro 5','Pantalla de 15.6", Intel Core i7, 16GB RAM, 1TB HDD + 256GB SSD, GPU NVIDIA RTX 3050',30, 1100),
-(20,'LG Gram 17','Pantalla de 17", Intel Core i7, 16GB RAM, 1TB SSD, ultraligero, batería de larga duración',28, 1400);
+INSERT INTO `producto` (`idproducto`, `pronombre`, `prodetalle`, `procantstock`, `precioprod`) VALUES
+(1, 'Cargador Carga Rápida 20W', 'Adaptador de pared USB-C carga rápida universal', 50, 4500),
+(2, 'Cable USB-C a USB-C 1m', 'Cable reforzado de nylon trenzado, 1 metro', 100, 2500),
+(3, 'Funda Transparente iPhone 14', 'Funda de silicona reforzada en esquinas, anti-golpes', 30, 1800),
+(4, 'Auriculares Bluetooth In-Ear', 'Auriculares inalámbricos con estuche de carga, 12hs batería', 25, 8900),
+(5, 'Vidrio Templado Universal', 'Protector de pantalla 9D alta resistencia', 200, 1200),
+(6, 'Soporte Magnético Auto', 'Soporte para rejilla de ventilación con imán potente', 40, 3000),
+(7, 'Power Bank 10000mAh', 'Batería portátil ultra delgada con doble salida USB', 15, 7500),
+(8, 'Cable Lightning Certificado', 'Cable de carga para iPhone certificado, 1.5 metros', 80, 3200),
+(9, 'Aro de Luz LED Selfie', 'Aro de luz clip para celular, 3 intensidades', 60, 2100),
+(10, 'Funda Silicona Samsung S23', 'Funda suave al tacto con interior de microfibra', 35, 2800),
+(11, 'Cargador Inalámbrico Qi', 'Base de carga inalámbrica rápida 15W', 20, 5600),
+(12, 'Adaptador Jack 3.5mm', 'Adaptador de USB-C a auricular jack 3.5mm', 45, 1500),
+(13, 'Trípode Flexible (Gorilla)', 'Mini trípode flexible para celulares y cámaras', 25, 3400),
+(14, 'Memoria MicroSD 64GB', 'Tarjeta de memoria clase 10 alta velocidad', 55, 4200),
+(15, 'Funda Sumergible Universal', 'Bolsa impermeable para fotos bajo el agua', 70, 1900),
+(16, 'Lente Clip Ojo de Pez', 'Kit de lentes para cámara de celular (Macro + Wide)', 15, 2700),
+(17, 'Soporte de Escritorio', 'Base de aluminio ajustable para celular y tablet', 30, 4100),
+(18, 'Cargador Auto Doble USB', 'Cargador para encendedor de auto con carga rápida', 45, 2300),
+(19, 'PopSocket Diseño Liso', 'Soporte expansible para agarre seguro del celular', 150, 800),
+(20, 'Kit Limpieza Pantallas', 'Spray limpiador + paño de microfibra anti-rayas', 60, 1100);
 
 -- --------------------------------------------------------
 
