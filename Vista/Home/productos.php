@@ -54,11 +54,26 @@ $ABMcompraitem = new ABMCompraItem;
 <script>
     $(document).ready(function(){
         var colIMGS = [
-            '../imagenes/notebookIMG1.jpg',
-            '../imagenes/notebookIMG2.jpg',
-            '../imagenes/notebookIMG3.jpg',
-            '../imagenes/notebookIMG4.jpg',
-            '../imagenes/notebookIMG5.jpg'
+            '../imagenes/1.png',
+            '../imagenes/2.jpg',
+            '../imagenes/3.jpeg',
+            '../imagenes/4.jpeg',
+            '../imagenes/5.jpg',
+            '../imagenes/6.png',
+            '../imagenes/7.jpeg',
+            '../imagenes/8.jpg',
+            '../imagenes/9.jpg',
+            '../imagenes/10.jpg',
+            '../imagenes/11.jpg',
+            '../imagenes/12.jpg',
+            '../imagenes/13.jpeg',
+            '../imagenes/14.jpg',
+            '../imagenes/15.jpeg',
+            '../imagenes/16.jpeg',
+            '../imagenes/17.jpg',
+            '../imagenes/18.jpeg',
+            '../imagenes/19.png',
+            '../imagenes/20.jpeg'
         ];
 
         $.ajax({
