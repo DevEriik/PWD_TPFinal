@@ -52,9 +52,9 @@ if($userID == 1){ #administrador
     <script type="text/javascript" src="../js/script.js"></script>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light <?= $colorFondo ?>">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">comahu<p class="text-primary d-inline"><b>e-shop</b></p></a>
+        <a class="navbar-brand" href="#">cel<p class="text-primary d-inline"><b>u-store</b></p></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>

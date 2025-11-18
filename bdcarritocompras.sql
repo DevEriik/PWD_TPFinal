@@ -27,7 +27,6 @@ SET time_zone = "+00:00";
 --
 -- Estructura de tabla para la tabla `producto`
 --
--- comenzamos cargando 5-10 notebooks y dejamos una carpeta con imagenes
 CREATE TABLE `producto` (
   `idproducto` bigint(20) NOT NULL,
   `pronombre` varchar(100) NOT NULL,
