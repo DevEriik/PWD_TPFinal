@@ -101,6 +101,8 @@ $totalCarrito = $resultadoCarrito['totalCarrito'];
                         setTimeout(function() {
                             window.location.href = response.redirect;
                         }, 1500); // Esperar 1.5 segundos antes de redirigir
+                    } else if (response.status === 'stock_error') {
+                        alert('❌ No se pudo confirmar la compra:\n' + response.message);
                     } else {
                         alert('Compra no confirmada: ' + response.message);
                     }

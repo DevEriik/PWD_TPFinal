@@ -37,6 +37,44 @@ $compraIniciada = $ABMcompraEstado->buscarCompraIniciada($UsuarioActual->getIdus
 if ($compraIniciada !== null) {
     $compraIniciada = dismount($compraIniciada);
     $idCompra = $compraIniciada['idcompra'];
+// --------------------------------------------
+// VALIDACIÓN DE STOCK ANTES DE CONFIRMAR COMPRA
+// --------------------------------------------
+$ABMcompraItem = new ABMCompraItem();
+$ABMproducto = new ABMProducto();
+
+// Obtengo todos los productos del carrito
+$carrito = $ABMcompraItem->obtenerProductosCarrito($UsuarioActual->getIdusuario());
+$productos = $carrito['productosCarrito'];
+
+foreach ($productos as $prod) {
+    $idProducto = $prod['idproducto'];
+    $cantidadPedida = $prod['Cantidad'];
+
+    // Obtengo stock real actual
+    $productoBD = $ABMproducto->buscar(['idproducto' => $idProducto]);
+
+    if (!$productoBD) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => "Error: producto no encontrado (ID $idProducto)"
+        ]);
+        exit;
+    }
+
+    $productoBD = $productoBD[0];
+    $stockActual = $productoBD->getProcantstock();
+
+    // Si la cantidad pedida supera el stock → NO permitir compra
+    if ($cantidadPedida > $stockActual) {
+        echo json_encode([
+            'status' => 'stock_error',
+            'message' => "No hay stock suficiente de '{$prod['Nombre']}'. Disponible: $stockActual"
+        ]);
+        exit;
+    }
+}
+
     $CompraConfirmada = $ABMcompraEstado->confirmarCompra($idCompra, $fechaFin);
     if($CompraConfirmada){
         $UsuarioActual = dismount($UsuarioActual);
