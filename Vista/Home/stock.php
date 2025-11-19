@@ -32,7 +32,7 @@ if (!$usuarioPermitido) {
             <thead class="thead-dark">
                 <tr>
                     <th>ID</th>
-                    <th>Accesorios</th> 
+                    <th>Accesorio</th> 
                     <th>Detalle</th>
                     <th>Precio</th>
                     <th>Stock Actual</th>
