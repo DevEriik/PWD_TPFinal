@@ -213,21 +213,34 @@ class Usuario{
         return $resp;
     }*/
     
-public function modificar() {
-    $resp = false;
-    $base = new BaseDatos();
-    $sql = "UPDATE usuario SET usnombre = '" . $this->getUsnombre() . "', uspass = '" . $this->getUspass() . "', usmail = '" . $this->getUsmail() . "', usdeshabilitado = '" . $this->getUsdeshabilitado() . "' WHERE idusuario = " . $this->getIdusuario() . ";";
-    if ($base->Iniciar()) {
-        if ($base->Ejecutar($sql)) {
-            $resp = true;
+public function modificar(){
+        $resp = false;
+        $base = new BaseDatos();
+        
+
+        $usdeshabilitado_sql = $this->getUsdeshabilitado();
+        
+        if ($usdeshabilitado_sql == null) {
+            $usdeshabilitado_sql = "NULL"; // Sin comillas
         } else {
-            $this->setMensajeoperacion("usuario->modificar: " . $base->getError());
+            $usdeshabilitado_sql = "'" . $usdeshabilitado_sql . "'"; // Con comillas
         }
-    } else {
-        $this->setMensajeoperacion("usuario->modificar: " . $base->getError());
+
+
+        $sql = "UPDATE usuario SET 
+                usnombre='" . $this->getUsnombre() . "', 
+                uspass='" . $this->getUspass() . "', 
+                usmail='" . $this->getUsmail() . "', 
+                usdeshabilitado=" . $usdeshabilitado_sql . " 
+                WHERE idusuario=" . $this->getIdusuario();
+        
+        if($base->Ejecutar($sql)){
+            $resp = true;
+        }else{
+            $this->setmensajeoperacion("Usuario->modificar: ".$base->getError());
+        }
+        return $resp;
     }
-    return $resp;
-}
 
     public function eliminar(){
         $resp = false;
