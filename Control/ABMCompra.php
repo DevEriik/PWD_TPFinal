@@ -294,6 +294,54 @@ class ABMCompra {
 
         return  $datosCliente;
     }
+
+    /**
+     * Realiza todo el proceso de confirmación: Valida stock y cambia estados.
+     * @param object $objUsuario
+     * @return array Retorna estado y mensaje
+     */
+    public function procesarConfirmacionCompra($objUsuario) {
+        $ABMcompraEstado = new ABMCompraEstado();
+        $ABMcompraItem = new ABMCompraItem();
+        
+        // 1. Buscar el carrito (Compra iniciada)
+        $compraIniciada = $ABMcompraEstado->buscarCompraIniciada($objUsuario->getIdusuario());
+
+        if ($compraIniciada === null) {
+            return ['status' => 'error', 'message' => 'No tienes ninguna compra iniciada.'];
+        }
+
+        $idCompra = $compraIniciada->getIdcompra();
+
+        // 2. Validar Stock (Esta es la lógica que sacamos del Action)
+        $itemsCarrito = $ABMcompraItem->buscar(['idcompra' => $idCompra]);
+        
+        foreach ($itemsCarrito as $item) {
+            $producto = $item->getObjProducto();
+            $cantidadPedida = $item->getCicantidad();
+            $stockActual = $producto->getProcantstock();
+            $nombreProd = $producto->getPronombre();
+
+            if ($cantidadPedida > $stockActual) {
+                // Si falta stock, cortamos acá y avisamos
+                return [
+                    'status' => 'stock_error', 
+                    'message' => "No hay suficiente stock de '$nombreProd'. Disponibles: $stockActual."
+                ];
+            }
+        }
+
+        // 3. Si pasó el bucle, hay stock. Procedemos a confirmar.
+        $fechaFin = date('Y-m-d H:i:s');
+        // Llamamos a la función que ya tenías en ABMCompraEstado que cierra, abre nuevo y resta stock
+        $exito = $ABMcompraEstado->confirmarCompra($idCompra, $fechaFin);
+
+        if ($exito) {
+            return ['status' => 'success', 'message' => 'Compra confirmada.'];
+        } else {
+            return ['status' => 'error', 'message' => 'Error al actualizar los estados de la compra.'];
+        }
+    }
     
 }
 ?>
