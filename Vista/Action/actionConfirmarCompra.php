@@ -32,9 +32,6 @@ if ($compraIniciada !== null) {
     // No usamos dismount para mantenerlo como objeto y usar getters
     $idCompra = $compraIniciada->getIdcompra();
 
-    // --------------------------------------------
-    // 1. VALIDACIÓN DE STOCK (ACTIVADA)
-    // --------------------------------------------
     $ABMcompraItem = new ABMCompraItem();
     $ABMproducto = new ABMProducto();
 
@@ -64,9 +61,6 @@ if ($compraIniciada !== null) {
         ]);
         exit; // DETENEMOS TODO AQUÍ
     }
-    // --------------------------------------------
-    // FIN VALIDACIÓN
-    // --------------------------------------------
 
     // Si hay stock, procedemos a confirmar y RESTAR
     $CompraConfirmada = $ABMcompraEstado->confirmarCompra($idCompra, $fechaFin);
