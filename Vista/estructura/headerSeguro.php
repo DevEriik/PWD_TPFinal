@@ -25,14 +25,14 @@ $abmMenuRol = new ABMMenuRol();
 $menus = $abmMenuRol->buscar(['idrol'=>$userID]);
 
 /* estilos personalizados para el navbar dependiendo el rol */
-$colorFondo = 'bg-light'; // Color por defecto
-if($userID == 1){ #administrador
-    $colorFondo = ' bg-warning ';
-}elseif($userID == 2){ #deposito
-    $colorFondo = ' bg-secondary ';
-}else{ #cliente
-    $colorFondo = ' bg-success ';
-}
+//$colorFondo = 'bg-light'; // Color por defecto
+//if($userID == 1){ #administrador
+//    $colorFondo = ' bg-warning ';
+//}elseif($userID == 2){ #deposito
+//    $colorFondo = ' bg-secondary ';
+//}else{ #cliente
+//    $colorFondo = ' bg-success ';
+//}
 ?>
 
 <!DOCTYPE html>
