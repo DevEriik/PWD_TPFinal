@@ -213,48 +213,62 @@ class ABMCompra {
      * actualiza una compra y las tablas relacionadas
      * ¿hay alguun problema con instanciar otros ABM dentro de este?
      */
-    public function actualizarCompra($idUsuario, $idProducto,$cantSeleccionada){
-        $ABMCompraEstado = new ABMCompraEstado;
-        $ABMCompraItem = new ABMCompraItem;
+    public function actualizarCompra($idUsuario, $idProducto, $cantSeleccionada){
+        $ABMCompraEstado = new ABMCompraEstado();
+        $ABMCompraItem = new ABMCompraItem();
         $bandera = false;
         $fechaCompra = date('Y-m-d H:i:s');
         
-        // busco si existe el carrito
+        // 1. Buscamos si ya tiene carrito abierto (Manejamos si devuelve null o array vacío)
         $compraIniciada = $ABMCompraEstado->buscarCompraIniciadaPorUsuario($idUsuario);
-        if ($compraIniciada === null) {
+        
+        // Si NO hay compra iniciada (es null o array vacío)
+        if (empty($compraIniciada)) {
 
-            // Insertar la compra utilizando ABMCompra
-            if ($this->alta(['idcompra' => null,'cofecha' => $fechaCompra,'idusuario' => $idUsuario])) {
-                // Obtener el ID de la compra recien creada
-                $idCompra = $this->buscar(['cofecha' => $fechaCompra, 'idusuario' => $idUsuario])[0]->getIdcompra();
+            // A. Crear la Compra
+            if ($this->alta(['idcompra' => null, 'cofecha' => $fechaCompra, 'idusuario' => $idUsuario])) {
+                
+                // B. Obtener el ID de forma SEGURA (La última compra de este usuario)
+                $comprasDelUsuario = $this->buscar(['idusuario' => $idUsuario]);
+                $ultimaCompra = end($comprasDelUsuario); // Obtiene el último elemento del array
+                $idCompra = $ultimaCompra->getIdcompra();
 
-                // Insertar el estado de la compra utilizando ABMCompraEstado
-                if ($ABMCompraEstado->alta(['idcompraestado' => null,'idcompra' => $idCompra,'idcompraestadotipo' => 1, 'cefechaini' => $fechaCompra,'cefechafin' => null])) {
-                    // Insertar los elementos del carrito en la tabla compraitem
-
-                    if ($ABMCompraItem->alta(['idcompraitem' => null,'idproducto' => $idProducto, 'idcompra' => $idCompra,'cicantidad' => $cantSeleccionada])) {
+                // C. Crear el Estado (Iniciada)
+                // Nota: cefechafin va como null, nuestro arreglo anterior en CompraEstado lo manejará bien.
+                if ($ABMCompraEstado->alta(['idcompraestado' => null, 'idcompra' => $idCompra, 'idcompraestadotipo' => 1, 'cefechaini' => $fechaCompra, 'cefechafin' => null])) {
+                    
+                    // D. Agregar el Ítem
+                    if ($ABMCompraItem->alta(['idcompraitem' => null, 'idproducto' => $idProducto, 'idcompra' => $idCompra, 'cicantidad' => $cantSeleccionada])) {
                         $bandera = true;
                     }
                 }
             }
-        } else { // Si ya tiene una compra iniciada
-            // Extraer el idcompra de la compra iniciada
-            $idCompraIniciada = $compraIniciada[0]->getIdcompra();
-            // Verificar si ya existe un CompraItem con el mismo idproducto y idcompra
+        } else { 
+            // Si YA tiene compra iniciada
+            // Obtenemos el objeto compra (el primer elemento del array)
+            $objCompraIniciada = $compraIniciada[0];
+            $idCompraIniciada = $objCompraIniciada->getIdcompra();
+            
+            // Buscamos si ya tiene ese producto en el carrito
             $compraItemExistente = $ABMCompraItem->buscar(['idcompra' => $idCompraIniciada, 'idproducto' => $idProducto]);
-            if (count($compraItemExistente) > 0) {
-                // Si ya existe, actualizar la cantidad
-                $compraItemExistente = $compraItemExistente[0];
-                $nuevaCantidad = $compraItemExistente->getCicantidad() + $cantSeleccionada;
-    
-                // obtengo el id producto y la nueva cantidad
-                if ($ABMCompraItem->modificacion(['idcompraitem' => $compraItemExistente->getIdcompraitem(),'idproducto' => $idProducto,'idcompra' => $idCompraIniciada,'cicantidad' => $nuevaCantidad])) {
+            
+            if (!empty($compraItemExistente)) {
+                // Si existe, sumamos cantidad
+                $item = $compraItemExistente[0];
+                $nuevaCantidad = $item->getCicantidad() + $cantSeleccionada;
+                
+                $param = [
+                    'idcompraitem' => $item->getIdcompraitem(),
+                    'idproducto' => $idProducto,
+                    'idcompra' => $idCompraIniciada,
+                    'cicantidad' => $nuevaCantidad
+                ];
+                if ($ABMCompraItem->modificacion($param)) {
                     $bandera = true;
                 }
             } else {
-                // Si no existe, insertar un nuevo CompraItem
-                // paso la cantidad seleccionada por el cliente
-                if ($ABMCompraItem->alta(['idcompraitem' => null,'idproducto' => $idProducto, 'idcompra' => $idCompraIniciada,'cicantidad' => $cantSeleccionada])) {
+                // Si no existe, lo creamos
+                if ($ABMCompraItem->alta(['idcompraitem' => null, 'idproducto' => $idProducto, 'idcompra' => $idCompraIniciada, 'cicantidad' => $cantSeleccionada])) {
                     $bandera = true;
                 }
             }

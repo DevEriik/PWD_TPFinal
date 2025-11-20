@@ -153,10 +153,29 @@ class CompraEstado {
     /**
      * Insertar un objeto en la base de datos
      */
-    public function insertar() {
+    public function insertar(){
         $resp = false;
         $base = new BaseDatos();
-        $sql = "INSERT INTO compraestado (idcompra, idcompraestadotipo, cefechaini, cefechafin) VALUES (" . $this->getObjCompra()->getIdcompra() . ", " . $this->getObjCompraEstadoTipo()->getIdcompraestadotipo() . ", '" . $this->getCefechaini() . "', '" . $this->getCefechafin() . "');";
+        
+        $fechaFin = $this->getCefechafin();
+        
+        if ($fechaFin == null) {
+            $fechaFinSQL = "NULL"; // Escribe la palabra NULL sin comillas
+        } else {
+            $fechaFinSQL = "'" . $fechaFin . "'"; // Le pone comillas si hay fecha
+        }
+
+        $fechaIni = $this->getCefechaini();
+        if ($fechaIni == null || $fechaIni == "") {
+            $fechaIni = date('Y-m-d H:i:s'); // Usa la hora actual si no hay
+        }
+        
+        $sql = "INSERT INTO compraestado (idcompra, idcompraestadotipo, cefechaini, cefechafin) VALUES (" . 
+                $this->getObjCompra()->getIdcompra() . ", " . 
+                $this->getObjCompraEstadoTipo()->getIdcompraestadotipo() . ", '" . 
+                $fechaIni . "', " . 
+                $fechaFinSQL . ");";
+
         if ($base->Iniciar()) {
             if ($base->Ejecutar($sql)) {
                 $resp = true;

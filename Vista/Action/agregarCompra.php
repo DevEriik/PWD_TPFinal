@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 include_once '../../configuracion.php';
 
 // Verifica si es una solicitud AJAX
@@ -39,5 +42,5 @@ if ($data) {
     echo json_encode(["status" => "error", "message" => "Datos no válidos"]);
 }
 
-include_once '../estructura/footer.php';
+//include_once '../estructura/footer.php';
 ?>

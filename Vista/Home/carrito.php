@@ -134,9 +134,9 @@ $totalCarrito = $resultadoCarrito['totalCarrito'];
                         var message = 'Su carrito ha sido cancelado. Si tiene alguna pregunta, por favor contáctenos.';
                         sendEmail(toName, toEmail, message);
                         // alert('Carrito cancelado con éxito. Se ha enviado un correo de confirmación.');
-                        setTimeout(function() {
-                            window.location.href = response.redirect;
-                        }, 1500); // Esperar 1.5 segundos antes de redirigir
+                       // setTimeout(function() {
+                       //     window.location.href = response.redirect;
+                       // }, 1500); // Esperar 1.5 segundos antes de redirigir
                     } else {
                         alert('Compra no confirmada: ' + response.message);
                     }

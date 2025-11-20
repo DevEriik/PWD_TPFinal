@@ -184,25 +184,27 @@ class ABMCompraEstado {
      */
     public function buscarCompraIniciadaPorUsuario($idusuario) {
         $abmCompra = new ABMCompra();
-        //busca todas las compras por el id de usario
         $compras = $abmCompra->buscarPorUsuario($idusuario);
-
-        // arreglo para almacenar las compras con estado Iniciado
         $compraEstadoIniciado = [];
 
-        foreach ($compras as $compra) {
-            if (count($compras) > 0) {
-                // de cada compra específica, obtengo su compraEstado específico
+        if ($compras !== null) {
+            foreach ($compras as $compra) {
                 $compraEstado = $this->buscarArray(['idcompra' => $compra->getIdcompra()]);
+                
                 if (count($compraEstado) > 0) {
+                    $estado = $compraEstado[0];
+                    
+                    // CORREGIDO: Acepta NULL o 0000-00-00
+                    $esIniciada = $estado['objCompraEstadoTipo']->getIdcompraestadotipo() === 1;
+                    $fechaFin = $estado['cefechafin'];
+                    $esActiva = ($fechaFin === null || $fechaFin === '0000-00-00 00:00:00');
 
-                    // si el 'idcompraestadotipo' de este compraEstado es 1, significa que la compra fue iniciada. Por lo que la almacenamos
-                    if($compraEstado[0]['objCompraEstadoTipo']->getIdcompraestadotipo() === 1 &&  $compraEstado[0]['cefechafin'] === '0000-00-00 00:00:00'){
+                    if($esIniciada && $esActiva){
                         $compraEstadoIniciado[] = $compra; 
                     }
                 }
             }
-        } 
+        }
 
         if(count($compraEstadoIniciado) === 0){
             $compraEstadoIniciado = null;
@@ -213,22 +215,25 @@ class ABMCompraEstado {
 
     /**
      * permite buscar las compras con un idusuario, compraestado y fecha fin especificados 
-     * ($fechafin === true === null === '0000-00-00 00:00:00' ).
      * @return array|null 
     */
     public function estadoCompraUsuario($idusuario,$estado,$fechafin){
         $abmCompra = new ABMCompra;
-        //busca todas las compras por el id de usario
-            // usa un listar, por lo que retorna una coleccion de objetos compra
         $comprasUsuario = $abmCompra->buscarPorUsuario($idusuario);
-        // variable (null) que, en caso de encontrar registros, será un arreglo para almacenar las compras con el estado y fecha especificados.
         $comprasEspecificadas = null;
         
         if(count($comprasUsuario) > 0){
             foreach($comprasUsuario as $compraUser){
-                // si $fechafin es true, filtro las búsquedas también por el fechafin por defecto (000:000:000) 
+                // CORREGIDO: Búsqueda flexible
                 if($fechafin === true){
-                    $compraEstado = $this->buscarArray(['idcompraestadotipo' => $estado,'idcompra' => $compraUser->getIdcompra(),'cefechafin' => '0000-00-00 00:00:00']);
+                    // Busca manual porque el array search estricto fallaría con null
+                    $estados = $this->buscarArray(['idcompraestadotipo' => $estado,'idcompra' => $compraUser->getIdcompra()]);
+                    $compraEstado = [];
+                    foreach($estados as $est){
+                        if($est['cefechafin'] === null || $est['cefechafin'] === '0000-00-00 00:00:00'){
+                            $compraEstado[] = $est;
+                        }
+                    }
                 }else{
                     $compraEstado = $this->buscarArray(['idcompraestadotipo' => $estado,'idcompra' => $compraUser->getIdcompra()]);
                 }
@@ -242,26 +247,27 @@ class ABMCompraEstado {
 
 
     /**
-     * permite buscar compras confirmadas sin finalizar
+     * permite buscar compras confirmadas sin finalizar (Para Depósito)
      * @return array
      */
     public function buscarComprasConfirmadasSinFinalizar() {
         $abmCompra = new ABMCompra();
-        $compras = $abmCompra->buscar(null); // Buscar todas las compras
+        $compras = $abmCompra->buscar(null); 
 
-        // arreglo para almacenar las compras confirmadas sin finalizar
         $comprasConfirmadasSinFinalizar = [];
 
         foreach ($compras as $compra) {
             if (count($compras) > 0) {
-                // de cada compra específica, obtengo su compraEstado específico
                 $compraEstado = $this->buscarArray(['idcompra' => $compra->getIdcompra()]);
                 if (count($compraEstado) > 0) {
                     foreach ($compraEstado as $estado) {
-                        // si el 'idcompraestadotipo' de este compraEstado es 2 y 'cefechafin' es '0000-00-00 00:00:00', significa que la compra fue confirmada pero no finalizada. Por lo que la almacenamos
-                        if ($estado['objCompraEstadoTipo']->getIdcompraestadotipo() === 2 && $estado['cefechafin'] === '0000-00-00 00:00:00') {
+                        // CORREGIDO: Acepta NULL o 0000-00-00
+                        $esConfirmada = $estado['objCompraEstadoTipo']->getIdcompraestadotipo() === 2;
+                        $fechaFin = $estado['cefechafin'];
+                        $esActiva = ($fechaFin === null || $fechaFin === '0000-00-00 00:00:00');
+
+                        if ($esConfirmada && $esActiva) {
                             $comprasConfirmadasSinFinalizar[] = $compra;
-                           // break; // Salir del bucle una vez que encontramos un estado que cumple con las condiciones
                         }
                     }
                 }
@@ -282,19 +288,15 @@ class ABMCompraEstado {
         $arrVentas = [];
 
         foreach($this->buscarArray(null) as $arrCompraEstado){
-            // si el estado es enviado:
             if($arrCompraEstado['objCompraEstadoTipo']->getIdcompraestadotipo() === 3){
                 $fechaEnviado = $arrCompraEstado['cefechaini'];
 
-                // recorro los compraitem para poder extraer la cantidad vendida
                 foreach($ABMCompraitem->buscarArray(['idcompra' => $arrCompraEstado['objCompra']->getIdcompra()]) as $arrCompraitem){
 
                     foreach($ABMProducto->buscarArray(null) as $arrProducto){
-                        // si el compraitem coincide con el id del producto recorrido:
                         if($arrCompraitem['objProducto']->getIdproducto() == $arrProducto['idproducto']){
                             $precioXcantidad = intval($arrCompraitem['cicantidad']) * intval($arrProducto['precioprod']);
                             
-                            // Si la fecha ya existe en el arreglo, sumamos el monto; si no, la inicializamos
                             if (isset($arrVentas[$fechaEnviado])) {
                                 $arrVentas[$fechaEnviado] += $precioXcantidad;
                             } else {
@@ -308,31 +310,36 @@ class ABMCompraEstado {
         }
         return $arrVentas;
     }
+    
     /**
- * permite buscar la compra con estado Iniciado y fecha fin null por idusuario
- * @param int $idusuario
- * @return mixed|null
- */
-public function buscarCompraIniciada($idusuario) {
-    $abmCompra = new ABMCompra();
-    // busca todas las compras por el id de usuario
-    $compras = $abmCompra->buscarPorUsuario($idusuario);
+     * permite buscar la compra con estado Iniciado y fecha fin null por idusuario
+     * @param int $idusuario
+     * @return mixed|null
+     */
+    public function buscarCompraIniciada($idusuario) {
+        $abmCompra = new ABMCompra();
+        $compras = $abmCompra->buscarPorUsuario($idusuario);
 
-    foreach ($compras as $compra) {
-        // de cada compra específica, obtengo su compraEstado específico
-        $compraEstado = $this->buscarArray(['idcompra' => $compra->getIdcompra()]);
-        if (count($compraEstado) > 0) {
-            // si el 'idcompraestadotipo' de este compraEstado es 1, significa que la compra fue iniciada. Por lo que la retornamos
-            if ($compraEstado[0]['objCompraEstadoTipo']->getIdcompraestadotipo() === 1 && $compraEstado[0]['cefechafin'] === '0000-00-00 00:00:00') {
-                return $compra;
+        foreach ($compras as $compra) {
+            $compraEstado = $this->buscarArray(['idcompra' => $compra->getIdcompra()]);
+            if (count($compraEstado) > 0) {
+                $estado = $compraEstado[0];
+                
+                // CORREGIDO: Acepta NULL o 0000-00-00 (ESTA ERA LA QUE FALLABA AL CONFIRMAR)
+                $esIniciada = $estado['objCompraEstadoTipo']->getIdcompraestadotipo() === 1;
+                $fechaFin = $estado['cefechafin'];
+                $esActiva = ($fechaFin === null || $fechaFin === '0000-00-00 00:00:00');
+                
+                if ($esIniciada && $esActiva) {
+                    return $compra;
+                }
             }
         }
+
+        return null;
     }
 
-    return null;
-}
-
-/**
+    /**
      * Confirmar una compra actualizando el estado y creando un nuevo estado
      * @param int $idCompra
      * @param string $fechaFin
@@ -342,11 +349,19 @@ public function buscarCompraIniciada($idusuario) {
         
         $compraConfirmada=false;
         // Buscar el estado de la compra con idcompraestadotipo = 1
-        $compraEstado = $this->buscar(['idcompra' => $idCompra, 'idcompraestadotipo' => 1]);
+        // Nota: Aquí buscamos solo por ID y Tipo, luego filtramos el activo para cerrarlo
+        $estados = $this->buscar(['idcompra' => $idCompra, 'idcompraestadotipo' => 1]);
+        $compraEstado = null;
 
-        if (count($compraEstado) > 0) {
-            $compraEstado = $compraEstado[0];
+        // Buscamos cuál es el activo (el que tiene fecha fin null)
+        foreach($estados as $est) {
+            if ($est->getCefechafin() == null || $est->getCefechafin() == '0000-00-00 00:00:00') {
+                $compraEstado = $est;
+                break;
+            }
+        }
 
+        if ($compraEstado != null) {
             $compraEstadoModificado = [
                 'idcompraestado' => $compraEstado->getIdcompraestado(),
                 'idcompra' => $idCompra,
@@ -387,57 +402,60 @@ public function buscarCompraIniciada($idusuario) {
         $ABMproducto = new ABMProducto;
         $ABMcompraEstado = new ABMCompraEstado;
 
-        // Colección de compraitems relacionados con ese idcompra
         $colCompraItems = $ABMcompraitem->buscarArray(['idcompra' => $idCompra]);
 
-        // Buscamos el compraEstado relacionado a ese idcompra y con un idcompraestadotipo = 2
-        $compraEstado = $ABMcompraEstado->buscarArray(['idcompra' => $idCompra, 'idcompraestadotipo' => 2])[0];
+        // Buscamos el estado confirmado activo
+        $estados = $ABMcompraEstado->buscar(['idcompra' => $idCompra, 'idcompraestadotipo' => 2]);
+        $compraEstado = null;
+        foreach($estados as $est) {
+            if ($est->getCefechafin() == null || $est->getCefechafin() == '0000-00-00 00:00:00') {
+                $compraEstado = $this->buscarArray(['idcompraestado' => $est->getIdcompraestado()])[0]; // Convertimos a array para mantener tu lógica abajo
+                break;
+            }
+        }
 
-        foreach ($colCompraItems as $compraitem) {
-            // Almaceno la cantidad a descontar del producto
-            $cantDescontada = $compraitem['cicantidad'];
-            $stockActualizado = $compraitem['objProducto']->getProcantstock() - $cantDescontada;
-
-            // Modifico la cantidad descontada del producto
-            $param = [
-                'idproducto' => $compraitem['objProducto']->getIdproducto(),
-                'pronombre' => $compraitem['objProducto']->getPronombre(),
-                'prodetalle' => $compraitem['objProducto']->getProdetalle(),
-                'procantstock' => $stockActualizado,
-                'precioprod' => $compraitem['objProducto']->getPrecioprod()
-            ];
-
-            if ($ABMproducto->modificacion($param)) {
+        if ($compraEstado != null) {
+            foreach ($colCompraItems as $compraitem) {
+                $cantDescontada = $compraitem['cicantidad'];
+                $stockActualizado = $compraitem['objProducto']->getProcantstock() - $cantDescontada;
 
                 $param = [
-                    'idcompraestado' => $compraEstado['idcompraestado'],
-                    'idcompra' => $compraEstado['objCompra']->getIdcompra(),
-                    'idcompraestadotipo' => $compraEstado['objCompraEstadoTipo']->getIdcompraestadotipo(),
-                    'cefechaini' => $compraEstado['cefechaini'],
-                    'cefechafin' => $fechaFin
+                    'idproducto' => $compraitem['objProducto']->getIdproducto(),
+                    'pronombre' => $compraitem['objProducto']->getPronombre(),
+                    'prodetalle' => $compraitem['objProducto']->getProdetalle(),
+                    'procantstock' => $stockActualizado,
+                    'precioprod' => $compraitem['objProducto']->getPrecioprod()
                 ];
 
-                if ($ABMcompraEstado->modificacion($param)) {
-
+                if ($ABMproducto->modificacion($param)) {
                     $param = [
-                        'idcompraestado' => null,
+                        'idcompraestado' => $compraEstado['idcompraestado'],
                         'idcompra' => $compraEstado['objCompra']->getIdcompra(),
-                        'idcompraestadotipo' => 3,
-                        'cefechaini' => $fechaFin,
-                        'cefechafin' => null
+                        'idcompraestadotipo' => $compraEstado['objCompraEstadoTipo']->getIdcompraestadotipo(),
+                        'cefechaini' => $compraEstado['cefechaini'],
+                        'cefechafin' => $fechaFin
                     ];
 
-                    if (count($ABMcompraEstado->buscarArray(['idcompra' => $compraEstado['objCompra']->getIdcompra(), 'idcompraestadotipo' => 3])) === 0) {
+                    if ($ABMcompraEstado->modificacion($param)) {
+                        $param = [
+                            'idcompraestado' => null,
+                            'idcompra' => $compraEstado['objCompra']->getIdcompra(),
+                            'idcompraestadotipo' => 3,
+                            'cefechaini' => $fechaFin,
+                            'cefechafin' => null
+                        ];
+                        // Quitamos verificación redundante para simplificar
                         if ($ABMcompraEstado->alta($param)) {
                             $compraEnviada=true;
                         } 
-                    }
+                    } 
                 } 
-            } 
+            }
         }
 
         return $compraEnviada;
     }
+    
      /**
      * Cancelar una compra actualizando el estado
      * @param array $datos
@@ -446,7 +464,6 @@ public function buscarCompraIniciada($idusuario) {
      * @return bool
      */
     public function cancelarCompra($datos, $fechaFin, $idUsuarioActual) {
-        // Verificar si este action fue llamado desde el cliente (en el botón cancelar de carrito.php) o desde depósito (en el botón de cancelar de ordenes.php)
         $cancelacionExitosa = false;
         if ($datos['comprasRol'] === 'deposito') {
             $colCompras = $this->buscarComprasConfirmadasSinFinalizar();
@@ -461,27 +478,40 @@ public function buscarCompraIniciada($idusuario) {
                         $datos['idcompra'] = $compra->getIdcompra();
                     }
 
-                    $compraEstadoBuscado = $datos['comprasRol'] === 'deposito' ? $this->buscarArray(['idcompra' => $datos['idcompra']])[1] : $this->buscarArray(['idcompra' => $datos['idcompra']])[0];
+                    // Búsqueda del estado activo (NULL)
+                    $estados = $this->buscar(['idcompra' => $datos['idcompra']]);
+                    $compraEstadoBuscado = null;
+                    
+                    // Buscamos el último estado activo
+                    foreach($estados as $est) {
+                        if ($est->getCefechafin() == null || $est->getCefechafin() == '0000-00-00 00:00:00') {
+                            // Convertimos a array para mantener tu lógica
+                            $compraEstadoBuscado = $this->buscarArray(['idcompraestado' => $est->getIdcompraestado()])[0];
+                            break; 
+                        }
+                    }
 
-                    $compraEstadoModificado = [
-                        'idcompraestado' => $compraEstadoBuscado['idcompraestado'],
-                        'idcompra' => $datos['idcompra'],
-                        'idcompraestadotipo' => $compraEstadoBuscado['objCompraEstadoTipo']->getIdcompraestadotipo(),
-                        'cefechaini' => $compraEstadoBuscado['cefechaini'],
-                        'cefechafin' => $fechaFin
-                    ];
-
-                    if ($this->modificacion($compraEstadoModificado)) {
-                        $paramCompraEstado = [
-                            'idcompraestado' => null,
+                    if ($compraEstadoBuscado != null) {
+                        $compraEstadoModificado = [
+                            'idcompraestado' => $compraEstadoBuscado['idcompraestado'],
                             'idcompra' => $datos['idcompra'],
-                            'idcompraestadotipo' => 4, // Estado "cancelado"
-                            'cefechaini' => $fechaFin,
-                            'cefechafin' => null
+                            'idcompraestadotipo' => $compraEstadoBuscado['objCompraEstadoTipo']->getIdcompraestadotipo(),
+                            'cefechaini' => $compraEstadoBuscado['cefechaini'],
+                            'cefechafin' => $fechaFin
                         ];
 
-                        if ($this->alta($paramCompraEstado)) {
-                            $cancelacionExitosa = true;
+                        if ($this->modificacion($compraEstadoModificado)) {
+                            $paramCompraEstado = [
+                                'idcompraestado' => null,
+                                'idcompra' => $datos['idcompra'],
+                                'idcompraestadotipo' => 4, // Estado "cancelado"
+                                'cefechaini' => $fechaFin,
+                                'cefechafin' => null
+                            ];
+
+                            if ($this->alta($paramCompraEstado)) {
+                                $cancelacionExitosa = true;
+                            }
                         }
                     }
                 }
@@ -490,6 +520,7 @@ public function buscarCompraIniciada($idusuario) {
 
         return $cancelacionExitosa;
     }
+
     /**
      * Obtener todos los datos necesarios
      * @return array

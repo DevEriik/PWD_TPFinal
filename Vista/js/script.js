@@ -4,7 +4,7 @@
 
 function sendEmail(toName, toEmail, message) {
   emailjs
-    .send("service_bya1soo", "template_7esyb7k", {
+    .send("service_o5pr1y6", "template_fsf82c5", {
       to_name: toName,
       to_email: toEmail,
       from_name: "Cel-uStore Team",
