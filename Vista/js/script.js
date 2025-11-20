@@ -2,9 +2,10 @@
   emailjs.init("vMQflWJRGofnRADyQ"); // Inicializa EmailJS con tu clave pública
 })();
 
-function sendEmail(toName, toEmail, message) {
+function sendEmail(toName, toEmail, message, templateID) {
   emailjs
-    .send("service_o5pr1y6", "template_fsf82c5", {
+    .send("service_o5pr1y6", templateID, {
+      // <-- Aquí usamos la variable, no el texto fijo
       to_name: toName,
       to_email: toEmail,
       from_name: "Cel-uStore Team",

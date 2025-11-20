@@ -96,7 +96,7 @@ $totalCarrito = $resultadoCarrito['totalCarrito'];
                         var toName = response.toName;
                         var toEmail = response.toEmail;
                         var message = 'Su compra ha sido confirmada con éxito. Gracias por su compra.';
-                        sendEmail(toName, toEmail, message);
+                        sendEmail(toName, toEmail, message, "template_fsf82c5");
                         alert('Compra confirmada con éxito. Se ha enviado un correo de confirmación.');
                         setTimeout(function() {
                             window.location.href = response.redirect;

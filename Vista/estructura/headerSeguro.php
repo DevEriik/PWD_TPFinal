@@ -62,9 +62,15 @@ if($userID == 1){ #administrador
             <ul class="navbar-nav ms-auto">
                 <?php
                 foreach ($menus as $menu) {
-                    echo '<li class="nav-item">';
-                    echo '<a class="nav-link" href="' . $menu->getObjMenu()->getMedescripcion() . '">' . $menu->getObjMenu()->getMenombre() . '</a>';
-                    echo '</li>';
+                    $objMenu = $menu->getObjMenu(); // Obtenemos el objeto Menú
+                    $deshabilitado = $objMenu->getMedeshabilitado(); // Obtenemos la fecha
+
+                    // FILTRO: Solo mostramos si la fecha es NULL o '0000-00-00...'
+                    if ($deshabilitado == null || $deshabilitado == '0000-00-00 00:00:00') {
+                        echo '<li class="nav-item">';
+                        echo '<a class="nav-link" href="' . $objMenu->getMedescripcion() . '">' . $objMenu->getMenombre() . '</a>';
+                        echo '</li>';
+                    }
                 }
                 ?>
             </ul>
