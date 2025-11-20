@@ -245,7 +245,10 @@ class ABMUsuario {
         $usuariosDeshabilitados = [];
 
         foreach ($usuarios as $usuario) {
-            if ($usuario->getUsDeshabilitado() === '0000-00-00 00:00:00') {
+            $fechaBaja = $usuario->getUsDeshabilitado();
+            
+            
+            if ($fechaBaja === null || $fechaBaja === '0000-00-00 00:00:00') {
                 $usuariosHabilitados[] = $usuario;
             } else {
                 $usuariosDeshabilitados[] = $usuario;
