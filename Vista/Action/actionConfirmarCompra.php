@@ -3,24 +3,18 @@ include_once '../../configuracion.php';
 
 // Verifica si es una solicitud AJAX
 $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-
-// Verifica si es una solicitud POST o GET
 $isPostOrGet = $_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'GET';
-
-// Verifica si el token de seguridad es válido (solo para POST/GET)
 $isValidToken = isset($_POST['form_security_token']) && $_POST['form_security_token'] === 'valor_esperado';
 
-// Si no es AJAX ni una solicitud válida POST/GET con el token, redirige
 if (!$isAjax && (!$isPostOrGet || !$isValidToken)) {
     header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'Solicitud no válida.']);
     exit;
 }
-// Configurar la zona horaria a Argentina
+
 date_default_timezone_set('America/Argentina/Buenos_Aires');
-//--------------------------------------------------------------------------------------------
 header('Content-Type: application/json');
-// voy creando el arreglo asociativo que voy a pasar como respuesta en formato JSON
+
 $response = [
     'status' => 'error',
     'message' => 'Error al confirmar la compra.',
@@ -35,53 +29,54 @@ $ABMcompraEstado = new ABMCompraEstado;
 $compraIniciada = $ABMcompraEstado->buscarCompraIniciada($UsuarioActual->getIdusuario());
 
 if ($compraIniciada !== null) {
-    $compraIniciada = dismount($compraIniciada);
-    $idCompra = $compraIniciada['idcompra'];
-// --------------------------------------------
-// VALIDACIÓN DE STOCK ANTES DE CONFIRMAR COMPRA
-// --------------------------------------------
-//$ABMcompraItem = new ABMCompraItem();
-//$ABMproducto = new ABMProducto();
+    // No usamos dismount para mantenerlo como objeto y usar getters
+    $idCompra = $compraIniciada->getIdcompra();
 
-// Obtengo todos los productos del carrito
-//$carrito = $ABMcompraItem->obtenerProductosCarrito($UsuarioActual->getIdusuario());
-//$productos = $carrito['productosCarrito'];
+    // --------------------------------------------
+    // 1. VALIDACIÓN DE STOCK (ACTIVADA)
+    // --------------------------------------------
+    $ABMcompraItem = new ABMCompraItem();
+    $ABMproducto = new ABMProducto();
 
-//foreach ($productos as $prod) {
-  //  $idProducto = $prod['idproducto'];
-    //$cantidadPedida = $prod['Cantidad'];
+    // Obtengo todos los items del carrito
+    $itemsCarrito = $ABMcompraItem->buscar(['idcompra' => $idCompra]);
+    $errorStock = false;
+    $mensajeError = "";
 
-    // Obtengo stock real actual
-    //$productoBD = $ABMproducto->buscar(['idproducto' => $idProducto]);
+    foreach ($itemsCarrito as $item) {
+        $producto = $item->getObjProducto();
+        $cantidadPedida = $item->getCicantidad();
+        $stockActual = $producto->getProcantstock();
+        $nombreProd = $producto->getPronombre();
 
-    //if (!$productoBD) {
-    //    echo json_encode([
-     //       'status' => 'error',
-     //       'message' => "Error: producto no encontrado (ID $idProducto)"
-    //    ]);
-    //    exit;
-   // }
+        // Si pedimos más de lo que hay
+        if ($cantidadPedida > $stockActual) {
+            $errorStock = true;
+            $mensajeError = "No hay suficiente stock de '$nombreProd'. Disponibles: $stockActual.";
+            break; // Cortamos el bucle al primer error
+        }
+    }
 
-  //  $productoBD = $productoBD[0];
-//    $stockActual = $productoBD->getProcantstock();
+    if ($errorStock) {
+        echo json_encode([
+            'status' => 'stock_error',
+            'message' => $mensajeError
+        ]);
+        exit; // DETENEMOS TODO AQUÍ
+    }
+    // --------------------------------------------
+    // FIN VALIDACIÓN
+    // --------------------------------------------
 
-    // Si la cantidad pedida supera el stock → NO permitir compra
-    //if ($cantidadPedida > $stockActual) {
-      //  echo json_encode([
-        //    'status' => 'stock_error',
-        //    'message' => "No hay stock suficiente de '{$prod['Nombre']}'. Disponible: $stockActual"
-        //]);
-        //exit;
-    //}
-//}
-
+    // Si hay stock, procedemos a confirmar y RESTAR
     $CompraConfirmada = $ABMcompraEstado->confirmarCompra($idCompra, $fechaFin);
+    
     if($CompraConfirmada){
-        $UsuarioActual = dismount($UsuarioActual);
+        // Obtenemos datos para el mail
         $response['status'] = 'success';
         $response['message'] = 'Compra confirmada.';
-        $response['toName'] = $UsuarioActual['usnombre'];
-        $response['toEmail'] = $UsuarioActual['usmail'];
+        $response['toName'] = $UsuarioActual->getUsnombre();
+        $response['toEmail'] = $UsuarioActual->getUsmail();
         $response['redirect'] = '../Home/carrito.php';
     }
 } 

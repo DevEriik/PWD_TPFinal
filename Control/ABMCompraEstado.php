@@ -340,20 +340,19 @@ class ABMCompraEstado {
     }
 
     /**
-     * Confirmar una compra actualizando el estado y creando un nuevo estado
+     * Confirmar una compra: Actualiza estado, crea nuevo estado Y DESCUENTA STOCK
      * @param int $idCompra
      * @param string $fechaFin
-     * @return array
+     * @return bool
      */
     public function confirmarCompra($idCompra, $fechaFin) {
         
-        $compraConfirmada=false;
-        // Buscar el estado de la compra con idcompraestadotipo = 1
-        // Nota: Aquí buscamos solo por ID y Tipo, luego filtramos el activo para cerrarlo
+        $compraConfirmada = false;
+        
+        // 1. Buscar el estado 'Iniciada' activo para cerrarlo
         $estados = $this->buscar(['idcompra' => $idCompra, 'idcompraestadotipo' => 1]);
         $compraEstado = null;
 
-        // Buscamos cuál es el activo (el que tiene fecha fin null)
         foreach($estados as $est) {
             if ($est->getCefechafin() == null || $est->getCefechafin() == '0000-00-00 00:00:00') {
                 $compraEstado = $est;
@@ -362,6 +361,7 @@ class ABMCompraEstado {
         }
 
         if ($compraEstado != null) {
+            // Cerramos el estado actual (Iniciada)
             $compraEstadoModificado = [
                 'idcompraestado' => $compraEstado->getIdcompraestado(),
                 'idcompra' => $idCompra,
@@ -371,17 +371,40 @@ class ABMCompraEstado {
             ];
 
             if ($this->modificacion($compraEstadoModificado)) {
-                // Insertar una nueva entrada en la tabla compraestado con idcompraestadotipo = 2
+                
+                // Creamos el nuevo estado (Aceptada/Confirmada)
                 $paramCompraEstado = [
                     'idcompraestado' => null,
                     'idcompra' => $idCompra,
-                    'idcompraestadotipo' => 2, // Estado "confirmada"
+                    'idcompraestadotipo' => 2, // Estado "Aceptada"
                     'cefechaini' => $fechaFin,
                     'cefechafin' => null
                 ];
 
                 if ($this->alta($paramCompraEstado)) {
-                    $compraConfirmada=true;
+                    
+                    $ABMcompraItem = new ABMCompraItem();
+                    $ABMproducto = new ABMProducto();
+                    
+                    // Buscamos los items de esta compra
+                    $items = $ABMcompraItem->buscar(['idcompra' => $idCompra]);
+                    
+                    foreach ($items as $item) {
+                        $prod = $item->getObjProducto();
+                        $nuevaCantidad = $prod->getProcantstock() - $item->getCicantidad();
+                        
+                        // Actualizamos el producto con la nueva cantidad
+                        $paramProd = [
+                            'idproducto' => $prod->getIdproducto(),
+                            'pronombre' => $prod->getPronombre(),
+                            'prodetalle' => $prod->getProdetalle(),
+                            'procantstock' => $nuevaCantidad, // Stock restado
+                            'precioprod' => $prod->getPrecioprod()
+                        ];
+                        $ABMproducto->modificacion($paramProd);
+                    }
+
+                    $compraConfirmada = true;
                 } 
             } 
         } 
