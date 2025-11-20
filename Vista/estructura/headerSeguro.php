@@ -1,30 +1,31 @@
 <?php
 include_once '../../configuracion.php';
 
-//primero si no tenes los roles andate al sql y hacele un insert a rol con estos valores
-//INSERT INTO `rol`(`idrol`, `rodescripcion`) VALUES ('1','Administrador')
-//INSERT INTO `rol`(`idrol`, `rodescripcion`) VALUES ('2','Deposito')
-//INSERT INTO `rol`(`idrol`, `rodescripcion`) VALUES ('3','Cliente')
-
-//ahora andate al bdcarritocompras.sql
-//busca la tabla del menu deje dos insert con las posibles opciones del menu (estas las podemos cambiar pero es para probar ahora)
-
-//busca la tabla menuRol hace los dos insert que tengo tambien ahi
-
 $session = new Session();
 if (!$session->activa() || !$session->validar()) {
-    
     header('Location: login.php');
     exit();
 }
 
-$userID = $session->getRol()[0]->getObjRol()->getIdrol();
+
+$roles = $session->getRol();
+
+
+if ($roles != null && count($roles) > 0) {
+    
+    $userID = $roles[0]->getObjRol()->getIdrol();
+} else {
+    
+    header('Location: ../Action/logout.php');
+    exit();
+}
+// ------------------------------------
 
 $abmMenuRol = new ABMMenuRol();
-
 $menus = $abmMenuRol->buscar(['idrol'=>$userID]);
 
 /* estilos personalizados para el navbar dependiendo el rol */
+$colorFondo = 'bg-light'; // Color por defecto
 if($userID == 1){ #administrador
     $colorFondo = ' bg-warning ';
 }elseif($userID == 2){ #deposito
@@ -32,8 +33,6 @@ if($userID == 1){ #administrador
 }else{ #cliente
     $colorFondo = ' bg-success ';
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -47,12 +46,11 @@ if($userID == 1){ #administrador
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <script src="../js/bootstrap.bundle.min.js"></script>
     <script src="../js/jquery-3.7.1.js"></script>
-    <!--mailsjs-->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript" src="../js/script.js"></script>
 </head>
 <body class="d-flex flex-column min-vh-100">
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light <?php echo $colorFondo; ?>">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Cel<p class="text-primary d-inline"><b>u-store</b></p></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,10 +60,10 @@ if($userID == 1){ #administrador
             <ul class="navbar-nav ms-auto">
                 <?php
                 foreach ($menus as $menu) {
-                    $objMenu = $menu->getObjMenu(); // Obtenemos el objeto Menú
-                    $deshabilitado = $objMenu->getMedeshabilitado(); // Obtenemos la fecha
+                    $objMenu = $menu->getObjMenu();
+                    $deshabilitado = $objMenu->getMedeshabilitado();
 
-                    // FILTRO: Solo mostramos si la fecha es NULL o '0000-00-00...'
+                    // Filtro de menú deshabilitado (NULL o fecha 0000)
                     if ($deshabilitado == null || $deshabilitado == '0000-00-00 00:00:00') {
                         echo '<li class="nav-item">';
                         echo '<a class="nav-link" href="' . $objMenu->getMedescripcion() . '">' . $objMenu->getMenombre() . '</a>';
