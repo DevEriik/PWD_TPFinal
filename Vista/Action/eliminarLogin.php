@@ -1,48 +1,57 @@
 <?php
 include_once '../../configuracion.php';
 
-// Verifica si es una solicitud AJAX
+
 $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-
-// Verifica si es una solicitud POST o GET
-$isPostOrGet = $_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'GET';
-
-// Verifica si el token de seguridad es válido (solo para POST/GET)
+$isPost = $_SERVER['REQUEST_METHOD'] === 'POST';
 $isValidToken = isset($_POST['form_security_token']) && $_POST['form_security_token'] === 'valor_esperado';
 
-// Si no es AJAX ni una solicitud válida POST/GET con el token, redirige
-if (!$isAjax && (!$isPostOrGet || !$isValidToken)) {
+if (!$isAjax) {
+    // Si intentan entrar por URL directa
     header('Location: ../Home/login.php');
     exit;
 }
 
-// Configurar la zona horaria a Argentina
-date_default_timezone_set('America/Argentina/Buenos_Aires');
-
-$session = new Session();
-if (!$session->activa() || !$session->validar()) {
-    header('Location: ../Home/login.php');
-    exit();
-}
 
 header('Content-Type: application/json');
+$datos = darDatosSubmitted();
 
-$response = [
-    'status' => 'error',
-    'message' => 'Error al intentar eliminar el usuario',
-    'redirect' => '../Home/actualizarUsuario.php'
-];
+// Verificar Sesión (Es crítico porque es una acción administrativa)
+$session = new Session();
+if (!$session->activa() || !$session->validar()) {
+    // Devolvemos JSON con instrucción de redirección, NO un header Location directo
+    echo json_encode([
+        'status' => 'error', 
+        'message' => 'La sesión ha expirado.', 
+        'redirect' => '../Home/login.php'
+    ]);
+    exit;
+}
 
+// Delegar al Control
 $abmUsuario = new ABMUsuario();
-$datos = darDatosSubmitted(); 
+$exito = false;
 
-$deshabilitado = $abmUsuario->deshabilitarUsuario($datos['id']);
-if ($deshabilitado) {
+// Validamos que venga el ID
+if (isset($datos['id'])) {
+    // La función deshabilitarUsuario del ABM se encarga de la "Baja Lógica"
+    // (Poner fecha de baja en lugar de borrar la fila)
+    $exito = $abmUsuario->deshabilitarUsuario($datos['id']);
+}
+
+
+$response = [];
+
+if ($exito) {
     $response['status'] = 'success';
-    $response['message'] = 'Usuario eliminado correctamente';
-    $response['redirect'] = '../Home/actualizarUsuario.php';
+    $response['message'] = 'Usuario eliminado correctamente.';
+    // Redirigimos a la misma página para refrescar la lista
+    $response['redirect'] = '../Home/actualizarUsuario.php'; 
+} else {
+    $response['status'] = 'error';
+    $response['message'] = 'Error al intentar eliminar el usuario.';
 }
 
 echo json_encode($response);
-exit();
+exit;
 ?>
