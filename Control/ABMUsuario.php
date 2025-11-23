@@ -484,5 +484,23 @@ class ABMUsuario {
         return null;
     }
 
+    /**
+     * Verifica si el nombre o mail ya existen en la BD.
+     * @param string $nombre
+     * @param string $mail
+     * @return array ['nombreExiste' => bool, 'emailExiste' => bool]
+     */
+    public function verificarDuplicados($nombre, $mail) {
+        // Busca por nombre
+        $listaNombre = $this->buscar(['usnombre' => $nombre]);
+        // Busca por mail
+        $listaMail = $this->buscar(['usmail' => $mail]);
+
+        return [
+            'nombreExiste' => count($listaNombre) > 0,
+            'emailExiste' => count($listaMail) > 0
+        ];
+    }
+
 }
 ?>

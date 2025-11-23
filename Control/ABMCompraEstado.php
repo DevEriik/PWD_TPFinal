@@ -590,5 +590,75 @@ class ABMCompraEstado {
         return $datos;
     }
 
+    /**
+     * Maneja la cancelación completa: BD, decisión de redirección y datos de mail.
+     * @param array $datos Datos del formulario
+     * @param object $objUsuarioSesion Objeto del usuario logueado
+     * @return array Respuesta lista para el JSON
+     */
+    public function procesarCancelacionCompleta($datos, $objUsuarioSesion) {
+        $fechaFin = date('Y-m-d H:i:s');
+        $idUsuario = $objUsuarioSesion->getIdusuario();
+
+        // 1. Ejecutar la lógica de base de datos (usando tu función existente)
+        $exito = $this->cancelarCompra($datos, $fechaFin, $idUsuario);
+
+        if (!$exito) {
+            return ['status' => 'error', 'message' => 'No se pudo realizar la cancelación.'];
+        }
+
+        // 2. Lógica de "A quién notificamos y a dónde vamos" (Lo que sacamos del Action)
+        $response = ['status' => 'success', 'message' => 'Operación exitosa'];
+
+        if (isset($datos['comprasRol']) && $datos['comprasRol'] === 'deposito') {
+            // CASO A: Cancela el Depósito -> Buscamos al dueño de la compra
+            $ABMCompra = new ABMCompra();
+            $datosCliente = $ABMCompra->clienteAsociadoALaCompra($datos['idcompra']);
+            
+            $response['toName'] = $datosCliente['name'];
+            $response['toEmail'] = $datosCliente['email'];
+            $response['redirect'] = '../Home/ordenes.php';
+        } else {
+            // CASO B: Cancela el Cliente -> Usamos sus propios datos
+            $response['toName'] = $objUsuarioSesion->getUsnombre();
+            $response['toEmail'] = $objUsuarioSesion->getUsmail();
+            $response['redirect'] = '../Home/carrito.php';
+        }
+
+        return $response;
+    }
+
+    /**
+     * Procesa el envío: Cambia estados, resta stock y prepara datos de respuesta.
+     * @param int $idCompra
+     * @return array Respuesta lista para el JSON
+     */
+    public function procesarEnvioCompra($idCompra) {
+        $fechaFin = date('Y-m-d H:i:s');
+        
+        // 1. Ejecutar la lógica dura (BD)
+        $exito = $this->enviarCompra($idCompra, $fechaFin);
+
+        // 2. Preparar respuesta
+        $response = [
+            'status' => 'error',
+            'message' => 'Error al enviar la compra (Revise stock o estado).',
+            'redirect' => '../Home/ordenes.php'
+        ];
+
+        if ($exito) {
+            // Si salió bien, buscamos los datos del cliente AQUÍ, no en el Action
+            $ABMCompra = new ABMCompra();
+            $datosCliente = $ABMCompra->clienteAsociadoALaCompra($idCompra);
+            
+            $response['status'] = 'success';
+            $response['message'] = 'Producto Enviado con éxito.';
+            $response['toName'] = $datosCliente['name'];
+            $response['toEmail'] = $datosCliente['email'];
+        }
+
+        return $response;
+    }
+
 }
 ?>

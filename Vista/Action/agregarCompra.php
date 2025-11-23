@@ -3,7 +3,6 @@ include_once '../../configuracion.php';
 
 
 $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-// Para agregar al carrito solemos usar POST
 $isPost = $_SERVER['REQUEST_METHOD'] === 'POST';
 $isValidToken = isset($_POST['form_security_token']) && $_POST['form_security_token'] === 'valor_esperado';
 

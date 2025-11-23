@@ -16,36 +16,17 @@ if (!$isAjax && (!$isPostOrGet || !$isValidToken)) {
 date_default_timezone_set('America/Argentina/Buenos_Aires');
 header('Content-Type: application/json');
 
-
+//  Obtener Datos
 $datos = darDatosSubmitted();
 $idCompra = $datos['idcompra'];
-$fechaFin = date('Y-m-d H:i:s');
 
-// Instanciamos los controles necesarios
+//  Delegar TOTALMENTE al Control
 $ABMCompraEstado = new ABMCompraEstado();
-$ABMCompra = new ABMCompra();
 
-//  Delegar al Control (MVC Puro)
-// La lógica de cambiar estado y restar stock está DENTRO de esta función del ABM
-$exito = $ABMCompraEstado->enviarCompra($idCompra, $fechaFin);
+// El ABM hace todo: cambio de estado, stock y búsqueda de datos del cliente
+$response = $ABMCompraEstado->procesarEnvioCompra($idCompra);
 
-
-$response = [
-    'status' => 'error',
-    'message' => 'Error al enviar la compra (Revise stock o estado).',
-    'redirect' => '../Home/ordenes.php'
-];
-
-if ($exito) {
-    // Buscamos datos del cliente solo para el mail
-    $datosCliente = $ABMCompra->clienteAsociadoALaCompra($idCompra);
-    
-    $response['status'] = 'success';
-    $response['message'] = 'Producto Enviado con éxito.';
-    $response['toName'] = $datosCliente['name'];
-    $response['toEmail'] = $datosCliente['email'];
-}
-
+//  Responder
 echo json_encode($response);
 exit;
 ?>
