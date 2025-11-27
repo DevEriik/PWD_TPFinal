@@ -1,19 +1,17 @@
 <?php
 include_once '../../configuracion.php';
 
-$session = new Session();
-
-// Llamamos al Control que creamos recién
+// Llamamos al Control
 $controlHeader = new ControlHeader();
+
+// Esta función ahora se encarga de validar. 
+// Si no es seguro, redirige sola. Si vuelve, es que todo está bien.
 $datosHeader = $controlHeader->obtenerDatosHeader();
 
-// Si el control nos dice "False", es que no hay sesión o rol válido
-if ($datosHeader === false) {
-    header('Location: ../Home/login.php');
-    exit();
-}
+// RECUPERAMOS LA SESIÓN para que esté disponible en el resto de las páginas
+$session = $datosHeader['objSession'];
 
-// Extraemos las variables limpias para usar en el HTML
+// Extraemos variables visuales
 $menus = $datosHeader['menus'];
 $colorFondo = $datosHeader['colorFondo'];
 ?>
@@ -44,12 +42,10 @@ $colorFondo = $datosHeader['colorFondo'];
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <?php
-                // La Vista solo recorre y muestra (Iteración simple)
                 foreach ($menus as $menu) {
                     $objMenu = $menu->getObjMenu();
                     $deshabilitado = $objMenu->getMedeshabilitado();
 
-                    // Pequeña lógica de visualización (permitida en vista, aunque idealmente podría ir en control)
                     if ($deshabilitado == null || $deshabilitado == '0000-00-00 00:00:00') {
                         echo '<li class="nav-item">';
                         echo '<a class="nav-link" href="' . $objMenu->getMedescripcion() . '">' . $objMenu->getMenombre() . '</a>';

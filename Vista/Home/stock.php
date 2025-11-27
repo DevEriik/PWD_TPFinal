@@ -3,17 +3,6 @@
 include_once('../estructura/headerSeguro.php');
 // creo un objeto de la clase abmUsuarioRol para llamar a la funcion verificarRolUsuario
 $abmUsuarioRol = new ABMUsuarioRol(); 
-
-// Obtener el ID del usuario en la sesion para verificar si tiene permisos
-$idUsuario = $session->getUsuario()->getIdUsuario();
-
-// Verificar si el usuario tiene permisos para acceder a esta página (el 2 es el deposito o sea que le estoy
-// diciendo que si el usuario no es deposito lo redirija al login)
-$usuarioPermitido = $abmUsuarioRol->verificarRolUsuario($idUsuario , 2);
-if (!$usuarioPermitido) {
-    header('Location: ../Home/login.php');
-    exit();
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">

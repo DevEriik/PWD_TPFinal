@@ -4,17 +4,6 @@ include_once('../estructura/headerSeguro.php');
 // creo un objeto de la clase abmUsuarioRol para llamar a la funcion verificarRolUsuario
 $abmUsuarioRol = new ABMUsuarioRol(); 
 
-// Obtener el ID del usuario en la sesion para verificar si tiene permisos
-$idUsuarioActual = $session->getUsuario()->getIdUsuario();
-
-// Verificar si el usuario tiene permisos para acceder a esta página (el 1 es el administrador o sea que le estoy
-// diciendo que si el usuario no es administrador lo redirija al login)
-$usuarioPermitido = $abmUsuarioRol->verificarRolUsuario($idUsuarioActual, 1);
-if (!$usuarioPermitido) {
-    header('Location: ../Home/login.php');
-    exit();
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
