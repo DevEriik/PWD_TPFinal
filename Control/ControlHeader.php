@@ -33,11 +33,11 @@ class ControlHeader {
 
         
         $colorFondo = 'bg-light';
-        if ($idRol == 1) { 
+        if ($idRol == 1) { //Administrador
             $colorFondo = 'bg-warning';
-        } elseif ($idRol == 2) { 
+        } elseif ($idRol == 2) { //Deposito
             $colorFondo = 'bg-secondary';
-        } elseif ($idRol == 3) { 
+        } elseif ($idRol == 3) { //Cliente
             $colorFondo = 'bg-success';
         }
 
